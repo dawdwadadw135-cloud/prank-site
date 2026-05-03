@@ -1,0 +1,121 @@
+<script>
+let stage = 0;
+let count = 10;
+let text = "";
+let running = false;
+
+/* PLAY BALLI VOICE */
+function playBalli(){
+  const s = document.getElementById("balliSound");
+  s.currentTime = 0;
+  s.play().catch(()=>{});
+}
+
+/* STOP ALL SOUNDS */
+function stopAllSounds(){
+  document.querySelectorAll("audio").forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
+}
+
+/* RGB BACKGROUND */
+setInterval(()=>{
+  let hue = Math.random()*360;
+  document.body.style.background = "hsl("+hue+",100%,50%)";
+},200);
+
+/* START CIRCLE */
+function startCircle(word){
+  stopAllSounds(); // 🔥 ALWAYS stop previous sound first
+
+  text = word;
+  count = 10;
+  running = true;
+
+  if(word === "Balli"){
+    playBalli();
+  }
+
+  document.body.classList.add("shake");
+  grow();
+}
+
+/* GROW WORDS */
+function grow(){
+  if(!running) return;
+
+  count += 5;
+  let container = document.getElementById("words");
+  container.innerHTML = "";
+
+  let radius = Math.min(window.innerWidth, window.innerHeight)/2 - 40;
+
+  for(let i=0;i<count;i++){
+    let angle = (i/count)*360;
+    let div = document.createElement("div");
+
+    div.className = "word";
+    div.innerText = text;
+    div.style.color = "hsl("+Math.random()*360+",100%,50%)";
+
+    div.style.transform =
+      "rotate("+angle+"deg) translate("+radius+"px) rotate(-"+angle+"deg)";
+
+    container.appendChild(div);
+  }
+
+  setTimeout(grow,1000);
+}
+
+/* BUTTON LOGIC */
+let btn = document.getElementById("mainBtn");
+
+btn.onclick = function(){
+  if(stage === 0){
+    btn.innerText = "Balli";
+    stage = 1;
+  }
+  else if(stage === 1){
+    startCircle("Balli");
+    stage = 2;
+  }
+  else if(stage === 2){
+    stopAllSounds(); // 🔥 STOP SOUND HERE
+    running = false;
+    document.body.classList.remove("shake");
+    btn.innerText = "Yashu";
+    stage = 3;
+  }
+  else if(stage === 3){
+    startCircle("Yashu");
+    stage = 4;
+  }
+  else if(stage === 4){
+    stopAllSounds(); // 🔥 ALSO STOP HERE
+    running = false;
+    document.body.classList.remove("shake");
+    btn.innerText = "Sunderi Mundri";
+    stage = 5;
+  }
+  else if(stage === 5){
+    startCircle("Sunderi Mundri");
+    stage = 6;
+  }
+};
+
+/* SCREEN CLICK */
+document.body.addEventListener("click", function(e){
+  if(e.target.id === "mainBtn") return;
+
+  if(stage === 2 || stage === 4 || stage === 6){
+    stopAllSounds(); // 🔥 STOP ON SCREEN CLICK
+    running = false;
+    document.body.classList.remove("shake");
+
+    if(stage === 6){
+      window.top.location.href = "https://sites.google.com/view/your-site";
+    }
+  }
+});
+</script>
